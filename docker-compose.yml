@@ -1,0 +1,179 @@
+version: '3.1'
+
+services:
+    portal:
+        build:
+            context: ./fhir-portal
+            dockerfile: ./dev/Dockerfile
+            args: 
+                MOUNT_DIR: ${MOUNT_DIR}
+        restart: on-failure
+        environment:
+            DB_HOST: jdbc:postgresql://db:5432
+            DB_PASSWORD: postgres
+            DB_USER: postgres
+            SERVER_HOST: server
+            SERVER_PORT: 9090
+        volumes:
+            - ./fhir-portal/pom.xml:${MOUNT_DIR}/pom.xml
+            - ./fhir-portal/spring.iml:${MOUNT_DIR}/spring.iml
+            - ./fhir-portal/src:${MOUNT_DIR}/src
+            - ./fhir-portal/target:${MOUNT_DIR}/target
+            - ./importer/webroot/importer:${MOUNT_DIR}/src/main/resources/static/importer
+            - portal_data:/temp
+        networks: 
+            - net
+        ports:
+            - "9090:9090"
+        depends_on:
+            - server
+            - db
+        entrypoint: ["mvn", "spring-boot:run"]
+
+    db:
+        image: postgres:9.6-alpine
+        networks: 
+            - net
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: spring
+        volumes:
+            - portal_db_data:/var/lib/postgresql/data
+        restart: always
+        logging:
+            driver: none
+        healthcheck:
+            test: ["CMD", "wget", "http://localhost:5432"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+    server:
+        build:
+            context: ./fhir-server
+            dockerfile: ./dev/Dockerfile
+            args: 
+                MOUNT_DIR: ${MOUNT_DIR}
+        restart: on-failure
+        environment:
+            DB_HOST: fhir
+            DB_PASSWORD: postgres
+            DB_USER: postgres
+            DB_NAME: fhir_server
+            SERVER_PORT: 9092
+        networks: 
+            - net
+        volumes:
+            - ./fhir-server/pom.xml:${MOUNT_DIR}/pom.xml
+            - ./fhir-server/src:${MOUNT_DIR}/src
+            - ./fhir-server/target:${MOUNT_DIR}/target
+            - server_data:/temp
+        ports:
+            - "8080:8080"
+        depends_on: 
+            - fhir
+        entrypoint: [ "mvn", "jetty:run"]
+        healthcheck:
+            test: ["CMD", "wget", "http://localhost:8080"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+    fhir:
+        image: postgres:9.6-alpine
+        networks: 
+            - net
+        ports:
+            - "6543:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: fhir_server
+        volumes:
+            - server_fhir_data:/var/lib/postgresql/data
+        restart: always
+        logging:
+            driver: none
+        healthcheck:
+            test: ["CMD", "wget", "http://localhost:5432"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+        
+    pgadmin:
+        image: dpage/pgadmin4
+        networks: 
+            - net
+        ports:
+            - "5555:80"
+        environment:
+            PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+            PGADMIN_DEFAULT_PASSWORD: admin
+        restart: always
+        depends_on:
+            - db
+            - fhir
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
+        logging:
+            driver: none
+
+    importer:
+        image: eyesore/go:1.11
+        volumes:
+            - ./importer/backend:/app
+        ports:
+            - "7070:7070"
+        networks:
+            - net
+        environment:
+            GOBIN: /go/bin
+            EYELOG_FLAGS_DEFAULT: shortfile
+            APP_PORT: "7070"
+            APP_VERSION: 1.0.0
+            APP_ENVIRONMENT: development
+            APP_WORKING_DIR: /importer/
+        logging:
+            options:
+                max-size: "10k"
+    
+
+    httpd:
+        image: httpd:2.4-alpine
+        volumes:
+            - ./importer/backend/httpd.conf:/usr/local/apache2/conf/httpd.conf
+            - ./importer/webroot:/usr/local/apache2/htdocs
+        ports:
+            - "80:80"
+        links:
+            - importer
+        networks:
+            - net
+        logging:
+            options:
+                max-size: "1k"
+    importer_ui:
+        image: eyesore/ng:7.3
+        volumes:
+            - ./importer/ui:/ng
+            - ./importer/webroot:/build
+        networks:
+            - net
+        entrypoint:
+            - sh
+            - -c
+            - npm i && ng build --watch
+        logging:
+            options:
+                max-size: "5k"
+networks:
+    net:
+volumes:
+    portal_db_data:
+    server_fhir_data:
+    pgadmin_data:
+    portal_data:
+    server_data:

@@ -1,0 +1,42 @@
+.drop-zone {
+    max-width: 50vw;
+    height: 50vh;
+    display: table;
+    width: 100%;
+    padding: 7px;
+    margin: auto;
+    background-color: #eee;
+    border: dashed 5px #706f6f;
+    border-radius: 10px;
+}
+
+.text-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.drop-zone .text-wrapper .message{
+    font-family: sans-serif;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: rgba(14, 13, 13, 0.555)
+}
+
+.text-center {
+    text-align:center;
+}
+
+.hide-drag-placeholder .cdk-drag-placeholder{
+    display: none !important;
+}
+
+form {
+    width: 100%;
+    margin: initial;
+    padding: initial;
+    border-radius: initial;
+}
+
+label {
+    text-align: initial;
+}

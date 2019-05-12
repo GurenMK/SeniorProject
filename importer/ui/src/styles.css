@@ -1,0 +1,39 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+importer form {
+    width: 100%;
+}
+
+label{
+    text-align: unset;
+}
+/* FLEX STUFF */
+.flex {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.flex-item{
+	flex: 1;
+}
+.flex-item-2 {
+    flex: 2;
+}
+.flex-item-3 {
+    flex: 3;
+}
+.flex.align-self-center{
+	align-self: center;
+}
+.flex.gutters {
+    margin-left: -0.5%;
+}
+.flex.gutters .flex-item {
+    margin-left: 0.5%;
+}
+.flex.gutters .flex-item-2 {
+    margin-left: 0.5%;
+}
+.flex.gutters .flex-item-3 {
+    margin-left: 0.5%;
+}

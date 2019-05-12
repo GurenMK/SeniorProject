@@ -1,0 +1,159 @@
+<form [formGroup]="form" (ngSubmit)="submit">
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Upload File</mat-panel-title>
+            <mat-panel-description>.tsv</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div cdkDropList 
+          class="drop-zone" 
+          importerFileDrop
+          (onFileDrop)="onFileDrop($event)">
+          <div class="text-wrapper">
+            <div  class="text-center message">
+              <ng-container *ngIf="pool.length == 0; else poolList">
+                  Drop your file here!
+              </ng-container>
+            </div>
+            <ng-template #poolList>
+              <div *ngFor="let item of pool">
+                {{ item.name}}
+                <button mat-raised-button (click)="upload(item)" *ngIf="!uploaded">Upload</button>
+                <button mat-icon-button *ngIf="uploaded"><mat-icon>check</mat-icon></button>
+                <mat-progress-bar *ngIf="isLoading" mode="determinate" [value]="progress$ | async"></mat-progress-bar>
+              </div>
+            </ng-template>
+          </div>
+      </div>
+      <mat-action-row>
+        <a mat-button color="primary" (click)="nextStep()">Next</a>
+      </mat-action-row>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="step ===1" (opened)="setStep(1)" hideToggle>
+      <mat-expansion-panel-header>
+        Value Set
+      </mat-expansion-panel-header>
+      <div class="flex gutters">
+        <mat-form-field class="flex-item">
+          <mat-label for="resourceType">Resource Type</mat-label>
+          <input matInput type="text" id="resourceType" [formControlName]="fields.resourceType.name">
+        </mat-form-field>
+        <mat-form-field class="flex-item">
+          <mat-label for="publisher">Publisher</mat-label>
+          <input matInput type="text" id="publisher" [formControlName]="fields.publisher.name">
+        </mat-form-field>
+      </div>
+      <div class="flex gutters">
+        <mat-form-field class="flex-item">
+            <mat-label for="valueSetName">Name</mat-label>
+            <input matInput type="text" id="valueSetName" [formControlName]="fields.name.name">
+        </mat-form-field>
+        <div [formArrayName]="fields.contact.name">
+            <mat-form-field class="flex-item" [formGroupName]="0">
+                <mat-label for="contact">Contact name:</mat-label>
+                <input matInput type="text" id="contact" [formControlName]="fields.contact.list[0].name.name">
+            </mat-form-field>
+        </div>
+      </div>
+      <div class="flex gutters">
+        <mat-form-field class="flex-item">
+          <mat-label for="status">Status</mat-label>
+          <input matInput type="text" id="status" [formControlName]="fields.status.name">
+        </mat-form-field>
+        <mat-form-field class="flex-item">
+            <mat-label for="valueSetCodeURL">Url</mat-label>
+            <input matInput type="text" id="valueSetCodeURL" [formControlName]="fields.url.name">
+        </mat-form-field>
+      </div>
+      <div class="flex gutters">
+        <mat-form-field class="flex-item">
+          <mat-label for="version">Version</mat-label>
+          <input matInput type="text" id="version" [formControlName]="fields.version.name">
+        </mat-form-field>
+        <mat-form-field class="flex-item">
+          <mat-label for="copyright">Copyright</mat-label>
+          <input matInput type="text" id="copyright" [formControlName]="fields.copyright.name">
+        </mat-form-field>
+      </div>
+      <div class="flex gutters">
+          <mat-form-field class="flex-item">
+            <mat-label for="description">Description</mat-label>
+            <textarea matInput id="description" [formControlName]="fields.description.name"></textarea>
+          </mat-form-field>
+      </div>
+      <div class="flex gutters">
+        <mat-form-field class="flex-item">
+          <mat-label for="requirements">Requirements</mat-label>
+          <textarea matInput id="requirements" [formControlName]="fields.requirements.name"></textarea>
+        </mat-form-field>
+      </div>
+      <mat-action-row>
+        <a mat-button color="warn" (click)="prevStep()">Previous</a>
+        <a mat-button color="primary" (click)="nextStep()">Next</a>
+      </mat-action-row>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
+      <mat-expansion-panel-header>
+        Contents
+      </mat-expansion-panel-header>
+        <div *ngIf="fields.codeSystem as codeSystem" [formGroupName]="codeSystem.name">
+          <div *ngIf="codeSystem.group.conceptTemplates as concept" [formGroupName]="concept.name" >
+            <div class="flex gutters">
+              <div class="flex-item" *ngFor="let column of columns">
+                {{ '[' + column + ']'}}
+              </div>
+            </div>
+            <div class="flex gutters">
+              <mat-form-field class="flex-item">
+                <mat-label>Code</mat-label>
+                <input matInput [formControlName]="concept.group.code.name"/>
+              </mat-form-field>
+            </div>
+            <div class="flex gutters">
+              <mat-form-field class="flex-item">
+                <mat-label>Display</mat-label>
+                <input matInput [formControlName]="concept.group.display.name"/>
+              </mat-form-field>
+            </div>
+            <div class="flex gutters">
+              <mat-form-field class="flex-item">
+                <mat-label>Definition</mat-label>
+                <input matInput [formControlName]="concept.group.definition.name"/>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      <mat-action-row>
+        <a mat-button color="warn" (click)="prevStep()">Previous</a>
+        <button mat-button color="primary" (click)="submit()">Submit</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </mat-accordion>
+</form>   
+
+
+
+<!-- <div cdkDropList 
+    #poolList="cdkDropList" 
+    class="drop-zone hide-drag-placeholder" 
+    importerFileDrop 
+    (cdkDropListEntered)="enteredDrop($event)" >
+    <div *ngFor="let item of pool" (entered)="enteredDrop($event)">
+        {{item}}
+    </div>
+  <div class="text-wrapper">
+    <div class="text-center message">Drop your file here!</div>
+    
+  </div>
+</div>
+
+<div cdkDropList [cdkDropListData]="items" [cdkDropListConnectedTo]="[poolList, innerPoolList]">
+  <div [cdkDragData]="item" 
+    *ngFor="let item of items" 
+    cdkDrag
+    (cdkDragEntered)="enteredDrop($event)"
+    (cdkDragEnded)="dragEnded($event)">
+    {{item.name}}
+
+  </div>
+</div> -->

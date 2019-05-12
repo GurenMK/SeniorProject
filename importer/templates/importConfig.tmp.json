@@ -1,0 +1,39 @@
+{
+    "resourceType":"ValueSet",
+    "meta":{
+        "versionId":"1",
+        "lastUpdated":"2016-04-24T21:29:44.091-04:00"
+    },
+    "url":"http://team10fhirportal.com/fhir/ValueSet/AllOrganisms",
+    "version":"9.2",
+    "name":"All Organisms",
+    "status":"release",
+    "publisher":"CDC",
+    "contact":[
+        {
+            "name":"Team 10"
+        }
+    ],
+    "date":"2019-03-09",
+    "description":"NHSN All Organisms",
+    "requirements":"This value is published as part of FHIR in order to make the codes available to FHIR terminology services and so implementers can easily leverage the codes.",
+    "copyright":"",
+    "codeSystem":{
+        "system":"http://team10fhirportal.com/fhir/ValueSet/AllOrganisms",
+        "version":"9.2",
+        "caseSensitive":true,
+        "concept":[
+            {
+                "code":"{{code}}",
+                "abstract":false,
+                "display":"{{name}} - {{code}}",
+                "definition":"{{name}} - {{code}}",
+                "designation":[
+                    {
+                        "language":"english"
+                    }
+                ]
+            }
+        ]
+    }
+}

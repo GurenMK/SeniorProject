@@ -1,0 +1,29 @@
+Run the project for the first time with docker using the terminal.
+
+1. Execute "docker-compose up -d db pgadmin"
+
+2. navigate to localhost:5555 and log in
+    username: pgadmin4@pgadmin.org
+    password: admin
+
+3. Create "portal" server. In connections tab:
+    host: db    
+    database: spring
+    username: postgres
+    password: postgres
+    everything else leave default
+
+4. Restore "spring" database using spring-backup file
+
+5. Create "server" server. In connections tab:
+    host: fhir    
+    database: fhir_server
+    username: postgres
+    password: postgres
+    everything else leave default
+
+6. Restore "fhir_server" database using server-backup file
+
+7. Execute "docker-compose up server" and wait for server started message
+
+8. Execute "docker-compose up" for remaining docker services 
