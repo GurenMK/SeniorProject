@@ -27,3 +27,5 @@ Run the project for the first time with docker using the terminal.
 7. Execute "docker-compose up server" and wait for server started message
 
 8. Execute "docker-compose up" for remaining docker services 
+
+portal - localhost:9090
